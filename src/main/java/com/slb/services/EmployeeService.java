@@ -1,11 +1,9 @@
 package com.slb.services;
 
-import com.slb.daos.EmployeeRepository;
 import com.slb.domains.Employee;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.slb.dtos.DebitBalanceDTO;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -19,11 +17,11 @@ public interface EmployeeService {
 
     Employee save(Employee employee);
 
-    Employee calculateGrossWage(Employee employee);
+    Employee calculateGrossWage(String employeeId);
 
-    Employee calculateNetWage(Employee employee);
+    Employee calculateNetWage(String employeeId);
 
-    Employee updateTotalDebitBalance(Employee employee);
+    Employee updateTotalDebitBalance(DebitBalanceDTO debitBalanceDTO);
 
     Employee update(Employee employee);
 

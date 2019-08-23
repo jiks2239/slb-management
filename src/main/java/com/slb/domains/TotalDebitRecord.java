@@ -1,6 +1,7 @@
 package com.slb.domains;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.slb.enums.TransactionType;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -13,7 +14,7 @@ public class TotalDebitRecord extends AuditModel{
 
     private static final long serialVersionUID = 6387575517559465394L;
 
-    private Long totalDebitRecord;
+    private Long totalDebitBalance;
 
     @NotBlank(message = "Transaction Amount cannot be empty.")
     private Long transactionAmount;
@@ -21,18 +22,22 @@ public class TotalDebitRecord extends AuditModel{
     @NotBlank(message = "Transaction Date cannot be empty.")
     private Date transactionDate;
 
+    @NotBlank(message = "Transaction Type cannot be empty.")
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "employee_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Employee employee;
 
-    public Long getTotalDebitRecord() {
-        return totalDebitRecord;
+    public Long getTotalDebitBalance() {
+        return totalDebitBalance;
     }
 
-    public void setTotalDebitRecord(Long totalDebitRecord) {
-        this.totalDebitRecord = totalDebitRecord;
+    public void setTotalDebitBalance(Long totalDebitBalance) {
+        this.totalDebitBalance = totalDebitBalance;
     }
 
     public Long getTransactionAmount() {
@@ -57,5 +62,13 @@ public class TotalDebitRecord extends AuditModel{
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
+    }
+
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
     }
 }

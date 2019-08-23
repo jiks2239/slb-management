@@ -3,6 +3,8 @@ package com.slb.utils;
 import com.slb.domains.Account;
 import com.slb.domains.CurrentDebitRecord;
 import com.slb.domains.Employee;
+import com.slb.domains.TotalDebitRecord;
+import com.slb.enums.TransactionType;
 
 
 import java.time.LocalDate;
@@ -17,7 +19,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class SlbUtils {
 
 
-    public static Date getClosestJoinedDate(Set<Date> dates) {
+    public static Date getLastUpdatedDate(Set<Date> dates) {
         long now = System.currentTimeMillis();
         return Collections.min(dates, (d1, d2) -> {
             long diff1 = Math.abs(d1.getTime() - now);
@@ -26,14 +28,19 @@ public class SlbUtils {
         });
     }
 
-    public static Account getAccountByJoinedDate(Date date, Employee employee) {
+    private static Account getAccountByJoinedDate(Date date, Employee employee) {
         return employee.getAccounts().stream()
                 .filter(account -> account.getJoinedDate().equals(date))
                 .findFirst().orElse(null);
     }
 
+    private static TotalDebitRecord getTotalDebitRecordByUpdatedDate(Date date, Employee employee) {
+        return employee.getTotalDebitRecords().stream().filter(totalDebitRecord -> totalDebitRecord
+                .getTransactionDate().equals(date)).findFirst().orElse(null);
+    }
+
     private static Account getLatestAccount(Employee employee) {
-        Date closestDate = getClosestJoinedDate(employee.getAccounts()
+        Date closestDate = getLastUpdatedDate(employee.getAccounts()
                 .stream().map(Account::getJoinedDate).collect(Collectors.toSet()));
         return getAccountByJoinedDate(closestDate, employee);
     }
@@ -45,6 +52,17 @@ public class SlbUtils {
         Long grossWage = workingDays * account.getCurrentWage();
         account.setGrossWages(grossWage);
         return account;
+    }
+
+    public static Employee getUpdateDebitBalance(Employee employee) {
+        Date lastUpdatedDate = getLastUpdatedDate(employee.getTotalDebitRecords()
+                .stream().map(TotalDebitRecord::getTransactionDate).collect(Collectors.toSet()));
+        TotalDebitRecord totalDebitRecord = getTotalDebitRecordByUpdatedDate(lastUpdatedDate, employee);
+        if (TransactionType.CREDIT.equals(totalDebitRecord.getTransactionType())) {
+            totalDebitRecord.setTotalDebitBalance(totalDebitRecord.getTotalDebitBalance() + totalDebitRecord.getTransactionAmount());
+        } else if (TransactionType.DEBIT.equals(totalDebitRecord.getTransactionType())) {
+            totalDebitRecord.setTotalDebitBalance(totalDebitRecord.getTotalDebitBalance() - totalDebitRecord.getTransactionAmount());
+        }
     }
 
     private static Account getLatestNetWage(Account account) {

@@ -3,6 +3,7 @@ package com.slb.ServiceImpls;
 import com.slb.daos.EmployeeRepository;
 import com.slb.domains.Account;
 import com.slb.domains.Employee;
+import com.slb.dtos.DebitBalanceDTO;
 import com.slb.services.EmployeeService;
 import com.slb.utils.SlbUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -65,8 +66,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee calculateGrossWage(Employee employee) {
-        if (ObjectUtils.isEmpty(employee) || StringUtils.isEmpty(employee.getId()))
+    public Employee calculateGrossWage(String employeeId) {
+        assert !StringUtils.isEmpty(employeeId) : HttpStatus.NO_CONTENT;
+        Employee employee = getEmployeeById(employeeId);
+        if (ObjectUtils.isEmpty(employee))
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Invalid Employee.");
         Employee result = getEmployeeById(employee.getId());
         SlbUtils.calculateGrossWage(result);
@@ -74,8 +77,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee calculateNetWage(Employee employee) {
-        if (ObjectUtils.isEmpty(employee) || StringUtils.isEmpty(employee.getId()))
+    public Employee calculateNetWage(String employeeId) {
+        assert !StringUtils.isEmpty(employeeId) : HttpStatus.NO_CONTENT;
+        Employee employee = getEmployeeById(employeeId);
+        if (ObjectUtils.isEmpty(employee))
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Invalid Employee.");
         Employee result = getEmployeeById(employee.getId());
         Account account = SlbUtils.calculateNetWage(result);
@@ -84,7 +89,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee updateTotalDebitBalance(Employee employee) {
+    public Employee updateTotalDebitBalance(DebitBalanceDTO debitBalanceDTO) {
+        if (ObjectUtils.isEmpty(debitBalanceDTO) || StringUtils.isEmpty(debitBalanceDTO.getEmployeeId()))
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Invalid Details.");
+        Employee employee = getEmployeeById(debitBalanceDTO.getEmployeeId());
+        if (ObjectUtils.isEmpty(employee)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found.");
+
         return null;
     }
 
